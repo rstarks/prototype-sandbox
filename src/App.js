@@ -10,7 +10,7 @@ let fakeRecipeData = {
     name: 'Salmon, Potatoes, and Green Beans',
     times: [
       { preparartion: 10}
-    ]
+    ],
     ingredients: [
       { name: 'Baby Leeks', amount: 3, unit: 'oz' },
       { name: 'Organic Fingerling Potatoes', amount: 0.5, unit: 'lb' },
