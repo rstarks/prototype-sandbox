@@ -8,6 +8,23 @@ let defaultStyle = {
 let fakeRecipeData = {
   recipe: {
     name: 'Salmon, Potatoes, and Green Beans',
+    times: [
+      { preparartion: 10}
+    ]
+    ingredients: [
+      { name: 'Baby Leeks', amount: 3, unit: 'oz' },
+      { name: 'Organic Fingerling Potatoes', amount: 0.5, unit: 'lb' },
+      { name: 'Green Beans', amount: 5, unit: 'oz' },
+      { name: 'Salmon Fillets', amount: 2, unit: '' },
+      { name: 'Fresh Thyme', amount: 0.25, unit: 'oz' },
+      { name: 'Fresh Flat-leaf Parsley', amount: 0.25, unit: 'oz' },
+      { name: 'Champagne Vinegar', amount: 1, unit: 'Tbsp' },
+      { name: 'Dijon Mustard', amount: 1, unit: 'Tbsp' },
+      { name: 'Butter', amount: 1, unit: 'tsp' },
+      { name: 'Cooking Oil', amount: 0, unit: '' },
+      { name: 'Extra-virgin Olive Oil', amount: 0, unit: '' },
+      { name: 'Kosher Salt and Black Pepper', amount: 0, unit: '' }
+    ],
     steps: [
       {
         name: 'Prepare Leeks and Potatoes',
@@ -23,11 +40,24 @@ let fakeRecipeData = {
         name: 'Prepare Salmon',
         instructions: 'Spread about half of butter on Zone 1 of glass tray. Any uncovered butter may burn, so spread only enough for the fish to cover it. Pat salmon dry with paper towels. Season fish on both sides with a pinch of salt. Place salmon, skin side down, on top of butter. Make sure thinnest salmon fillet is on left side of Zone 1. Top each fillet with a few thyme sprigs.',
         parameters: [
-          {label: 'Rare', value: 113},
-          {label: 'Medium Rare', value: 118},
-          {label: 'Medium', value: 126},
-          {label: 'Medium Well', value: 129},
-          {label: 'Well Done', value: 133}
+          {
+            name: 'Thickness',
+            options: [
+              {label: '1"', value:1},
+              {label: '1.25"', value:1.25},
+              {label: '1.5"', value:1.5}
+            ]
+          },
+          {
+            name: 'Doneness',
+            options: [
+              {label: 'Rare', value: 113},
+              {label: 'Medium Rare', value: 118},
+              {label: 'Medium', value: 126},
+              {label: 'Medium Well', value: 129},
+              {label: 'Well Done', value: 133}
+            ]
+          }
         ]
       },
       {
@@ -90,32 +120,55 @@ class Filter extends Component {
 class ParameterSelector extends Component {
   constructor(props) {
     super(props);
-    this.state={selectedParameter: 0}
+    this.state={
+      options: []
+    }
+    this.onChange = this.onChange.bind(this);    
   }
   
   // Change the selected value
-  onChange(value) {
-    this.setState({
-      selectedParameter: value
-    })
+  onChange(event) {
+    const group = event.target.name;
+    const id = event.target.id;
+    const option = {group, id, option: event.target.value };
+    let options;
+    if (this.state.options.some(option => option.group === group)) {
+      options = [...this.state.options.filter(option => option.group !== group), option];
+    } else {
+      options = [...this.state.options, option];
+    }
+    this.setState(
+      {
+        options
+      }, () => console.log(this.state.options)
+    )
   }
 
   render() {
-    let listParameters = this.props.parameters.map((parameter, index) =>
-      <label key={index}>
-        <input 
-          type='radio' 
-          value={parameter.value} 
-          id={index}
-          checked={this.state.selectedParameter == index ? true : false}
-          onChange={this.onChange.bind(this,index)}
-        />
-        {parameter.label} - {parameter.value}
-      </label>
+    let parameterHeaders = [];
+    this.props.parameters.map((parameter,key) => 
+      (
+        parameterHeaders.push(
+          <div key={key} style={{marginTop:'24px'}}>{parameter.name}</div>,
+          parameter.options.map((option, index) => 
+            <label style={{display:'block', marginBottom:'12px'}} key={index}>
+              <input 
+                type='radio' 
+                value={option.value}
+                id={index}
+                name={parameter.name}
+                defaultChecked={index == 0 ? true : false}
+                onChange={this.onChange}
+              />
+              {option.label} - {option.value}
+            </label>
+          )
+        )
+      )
     );
     return (
       <div style={defaultStyle}><form>
-        {listParameters}
+        {parameterHeaders}
       </form></div>
     )
   }
@@ -129,6 +182,8 @@ class RecipePage extends Component {
       steps: this.props.steps,
     }
     this.nextPage = this.nextPage.bind(this);
+    this.lastPage = this.lastPage.bind(this);
+    this.prevPage = this.prevPage.bind(this);
   }
 
   render() {
@@ -144,13 +199,18 @@ class RecipePage extends Component {
 
     // Return the component markup
     return (
-      <div style={{...defaultStyle,display:'inlineblock',width: "25%"}}>
+      <div style={{...defaultStyle,float:'right',display:'inlineblock',width: "25%"}}>
         <h3><span>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
         <div>{this.state.steps[this.state.page].instructions}</div>
 
         <div><ParameterSelector parameters={this.state.steps[this.state.page].parameters} /></div>
 
-        <button className='btn btn-primary float-right' type='button' onClick={this.nextPage}>{buttonText}</button>
+        {/* Navigation Buttons */}
+        <button className='btn btn-secondary' type='button' onClick={this.prevPage}>&lt;</button>
+
+        <button className='btn btn-primary' type='button' onClick={this.nextPage}>{buttonText}</button>
+
+        <button className='btn btn-secondary' type='button' onClick={this.lastPage}>&gt;|</button>
       </div>
     );
   }
@@ -163,6 +223,20 @@ class RecipePage extends Component {
       });
     }
     console.log('Continue to ' + this.props.page.toString());
+  }
+
+  prevPage() {
+    if (!this.state.page-1 < 0) {
+      this.setState({
+        page: this.state.page-1
+      });
+    }
+  }
+
+  lastPage() {
+    this.setState({
+      page: this.state.steps.length-1
+    });
   }
 }
 
@@ -181,6 +255,7 @@ class App extends Component {
       this.setState({recipeData: fakeRecipeData});
     }, 1000);
   }
+
   render() {
     let stepsToRender = this.state.recipeData.recipe ? this.state.recipeData.recipe.steps
       /* FILTER CODE NOT NEEDED YET.filter(step =>
