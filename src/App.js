@@ -169,7 +169,7 @@ class ParameterSelector extends Component {
                     />
                     <label htmlFor={key.toString() + index.toString()} key={index}>
                     
-                    {option.label}<br />{parameter.name === "Doneness" ? option.value: ' '}
+                    {option.label}<br />({parameter.name === "Doneness" ? option.value: ' '})
                   </label></div>
                 )
               }
