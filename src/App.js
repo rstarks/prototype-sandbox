@@ -278,11 +278,14 @@ class RecipePage extends Component {
         <div className='instructions-wrapper'>
           <div ref={this.wrapperRef} className='instructions'>
             <h3><span className='step-counter'>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
-            <div className='instructions-text'>{this.state.steps[this.state.page].instructions}</div>
-
+            
             <div className='multi-selector'>
               <ParameterSelector parameters={this.state.steps[this.state.page].parameters} />
             </div>
+
+            <div className='instructions-text'>{this.state.steps[this.state.page].instructions}</div>
+
+            
           </div>
         </div>
 

@@ -44,6 +44,7 @@
 
 .instructions-text {
   line-height: 24px;
+  margin-bottom: 40px;
 }
 
 .instructions.flip {
@@ -93,7 +94,7 @@
 .multi-selector {
   margin: 0;
   padding: 0;
-  margin-bottom: 60px;
+  margin-bottom: 20px;
   font-size: 12px;
   width: 100%;
 }
@@ -110,6 +111,7 @@
 }
 
 .multi-selector-header {
+  font-weight: bold;
   margin-bottom: 8px;
   margin-top: 24px;
 }
