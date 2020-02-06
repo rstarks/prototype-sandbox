@@ -1,5 +1,6 @@
 .App {
   text-align: left;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .card {
@@ -41,6 +42,10 @@
   height: 100%;
 }
 
+.instructions-text {
+  line-height: 24px;
+}
+
 .instructions.flip {
   margin-left: 20px;
   transition: opacity .5s, margin .5s
@@ -73,8 +78,9 @@
   background-color: #EFEFEF;
   border-radius: 15px;
   border: 0;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: bold;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .btn.next {

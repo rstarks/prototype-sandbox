@@ -245,9 +245,6 @@ class RecipeScreen extends Component {
           nextPage={this.nextPage} 
           prevPage={this.prevPage}
           lastPage={this.lastPage}
-         /*page={this.props.page} 
-          steps={this.props.steps}*/ 
-
         />
       </div>
     )
@@ -258,19 +255,7 @@ class RecipePage extends Component {
   constructor(props) {
     super(props);
     this.state = {}
-
-    // Navigation bindings
-    //this.nextPage = this.nextPage.bind(this);
-    //this.lastPage = this.lastPage.bind(this);
-    //this.prevPage = this.prevPage.bind(this);
   }
-
-  // Used for page transition effect
-  /*componentWillUpdate() {
-    setTimeout(() => {
-      this.changePage();
-    }, 1000);
-  }*/
 
   static getDerivedStateFromProps(props, state) {
     return props.params;
@@ -293,7 +278,7 @@ class RecipePage extends Component {
         <div className='instructions-wrapper'>
           <div ref={this.wrapperRef} className='instructions'>
             <h3><span className='step-counter'>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
-            <div>{this.state.steps[this.state.page].instructions}</div>
+            <div className='instructions-text'>{this.state.steps[this.state.page].instructions}</div>
 
             <div className='multi-selector'>
               <ParameterSelector parameters={this.state.steps[this.state.page].parameters} />
