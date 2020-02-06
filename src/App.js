@@ -4,11 +4,14 @@ import FontAwesome from 'react-fontawesome';
 
 let currentPage = 0;
 let defaultStyle = {
-  color: '#000'
+  color: '#000',
+  margin: '0px',
+  padding: '0px'
 };
 let fakeRecipeData = {
   recipe: {
     name: 'Salmon, Potatoes, and Green Beans',
+    id: 'salmon-potatoes-greenbeans',
     times: [
       { preparartion: 10}
     ],
@@ -30,16 +33,19 @@ let fakeRecipeData = {
       {
         name: 'Prepare Leeks and Potatoes',
         instructions: 'Trim about 1/4 inch from top and bottom of leeks. Cut leeks in half lengthwise and remove outer layer. Slice leeks as thinly as possible into half-moons. Quarter fingerling potatoes lengthwise. In medium bowl, toss together leeks, potatoes, 1 teaspoon cooking oil and a pinch of salt. Evenly spread leeks and potatoes in Zone 3 of Brava glass tray.',
+        photo: 'step-01.jpg',
         parameters: []
       },
       {
         name: 'Prepare Green Beans',
         instructions: 'Trim stems from green beans. Cut beans in half crosswise. In same bowl, toss together green beans, 1/2 teaspoon cooking oil and a pinch of salt. Evenly spread green beans in Zone 2 of glass tray.',
+        photo: 'step-02.jpg',
         parameters: []
       },
       {
         name: 'Prepare Salmon',
         instructions: 'Spread about half of butter on Zone 1 of glass tray. Any uncovered butter may burn, so spread only enough for the fish to cover it. Pat salmon dry with paper towels. Season fish on both sides with a pinch of salt. Place salmon, skin side down, on top of butter. Make sure thinnest salmon fillet is on left side of Zone 1. Top each fillet with a few thyme sprigs.',
+        photo: 'step-03.jpg',
         parameters: [
           {
             name: 'Thickness',
@@ -64,59 +70,45 @@ let fakeRecipeData = {
       {
         name: 'Prepare TempSensor and Insert Glass Tray',
         instructions: 'Insert TempSensor horizontally through center of thickest part of thinnest salmon fillet. While food cooks, prepare vinaigrette.',
+        photo: 'step-04.jpg',
         parameters: []
       },
       {
         name: 'Make Vinaigrette',
         instructions: 'Remove parsley leaves from stems; coarsely chop leaves. In medium bowl, combine Champagne vinegar, Dijon mustard, parsley, 2 tablespoons extra-virgin olive oil and a pinch of salt and pepper; stir well.',
+        photo: 'step-05.jpg',
         parameters: []
       },
       {
         name: 'Serve',
         instructions: 'When your food is done, cut salmon in half crosswise. This will stop the cooking process and maintain your preferred doneness. Transfer leeks, potatoes and green beans to bowl with vinaigrette and toss to coat. Season to taste with salt and pepper. Arrange salmon and vegetables on individual plates. If desired, drizzle salmon with remaining vinaigrette from bowl.',
+        photo: 'step-06.jpg',
         parameters: []
       }
     ]
   }
 }
 
-/*class PlaylistCounter extends Component {
-  render() {
-    return (
-      <div style={{...defaultStyle, width: "40%", display:'inline-block'}}>
-        <h2>{this.props.playlists.length} playlists</h2>
-      </div>
-    );
-  }
-}
-
-class HoursCounter extends Component {
-  render() {
-    let allSongs = this.props.playlists.reduce((songs, eachPlaylist) => {
-      return songs.concat(eachPlaylist.songs)
-    },[])
-    let totalDuration = allSongs.reduce((sum, eachSong) => {
-      return sum + eachSong.duration
-    }, 0)
-    return (
-      <div style={{...defaultStyle, width: "40%", display:'inline-block'}}>
-        <h2>{Math.round(totalDuration/60)} minutes</h2>
-      </div>
-    );
-  }
-}
-
-class Filter extends Component {
-  render() {
-    return (
-      <div style={defaultStyle}>
-        <input type="text" onKeyUp={event => 
-          this.props.onTextChange(event.target.value)
-        }/>
-      </div>
-    );
-  }
-}*/
+// Dynamically load from JSON if possible
+const images = [{
+  name: 'step-01',
+  background: require('./images/salmon-potatoes-greenbeans/step-01.jpg')
+},{
+  name: 'step-02',
+  background: require('./images/salmon-potatoes-greenbeans/step-02.jpg')
+},{
+  name: 'step-03',
+  background: require('./images/salmon-potatoes-greenbeans/step-03.jpg')
+},{
+  name: 'step-04',
+  background: require('./images/salmon-potatoes-greenbeans/step-04.jpg')
+},{
+  name: 'step-05',
+  background: require('./images/salmon-potatoes-greenbeans/step-05.jpg')
+},{
+  name: 'step-06',
+  background: require('./images/salmon-potatoes-greenbeans/step-06.jpg')
+}]
 
 class ParameterSelector extends Component {
   constructor(props) {
@@ -168,9 +160,14 @@ class ParameterSelector extends Component {
                       onChange={this.onChange}
                     />
                     <label htmlFor={key.toString() + index.toString()} key={index}>
-                    
-                    {option.label}<br />({parameter.name === "Doneness" ? option.value: ' '})
-                  </label></div>
+                      <div>
+                        {option.label}
+                      </div>
+                      <div className='multi-selector-value'>
+                        {parameter.name === "Doneness" ? option.value + '°F' : ' '}
+                      </div>
+                    </label>
+                  </div>
                 )
               }
             </div>
@@ -187,19 +184,85 @@ class ParameterSelector extends Component {
   }
 }
 
-class RecipePage extends Component {
+class RecipeScreen extends Component {
   constructor(props) {
     super(props);
-    this.wrapperRef = React.createRef();
     this.state = {
       page: this.props.page,
       steps: this.props.steps,
     }
-
-    // Navigation bindings
     this.nextPage = this.nextPage.bind(this);
     this.lastPage = this.lastPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
+  }
+
+  // Go forward a page
+  // TODO: Later refactor into separate component
+  nextPage() { 
+    if (this.state.page+1 < this.state.steps.length) {
+      this.setState({
+        page: this.state.page+1
+      });
+    }
+    console.log('Continue to ' + this.state.page.toString());
+  }
+
+  // Go back a page
+  // TODO: Replace with page menu
+  prevPage() {
+    if (!this.state.page-1 < 0) {
+      this.setState({
+        page: this.state.page-1
+      });
+    }
+    console.log('Continue to ' + this.state.page.toString());
+  }
+
+  // Skip to the next required input
+  lastPage() {
+    this.setState({
+      page: this.state.steps.length-1
+    });
+  }
+
+  render() {
+    return (
+      //Switch to dynamic loading system, load in images dynamically from JSON
+      <div className='recipe-screen'
+      style={{
+        backgroundImage: 'url(' + images[this.state.page].background + ')',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: '0px',
+        height: '100%',
+        width: '100%',
+        padding: '0',
+        margin: '0'
+      }}>
+        {/*<h1 style={defaultStyle}>{this.props.recipeName}</h1>*/}
+        <RecipePage 
+          params={this.state}
+          nextPage={this.nextPage} 
+          prevPage={this.prevPage}
+          lastPage={this.lastPage}
+         /*page={this.props.page} 
+          steps={this.props.steps}*/ 
+
+        />
+      </div>
+    )
+  }
+}
+
+class RecipePage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {}
+
+    // Navigation bindings
+    //this.nextPage = this.nextPage.bind(this);
+    //this.lastPage = this.lastPage.bind(this);
+    //this.prevPage = this.prevPage.bind(this);
   }
 
   // Used for page transition effect
@@ -209,10 +272,8 @@ class RecipePage extends Component {
     }, 1000);
   }*/
 
-  changePage() {
-    // Animation testing
-    const wrapper = this.wrapperRef.current;
-    wrapper.classList.toggle('flip');
+  static getDerivedStateFromProps(props, state) {
+    return props.params;
   }
 
   render() {
@@ -242,16 +303,16 @@ class RecipePage extends Component {
 
         {/* Navigation Buttons */}
         <div className='nav'>
-          <button className='btn' type='button' onClick={this.prevPage}>
+          <button className='btn' type='button' onClick={this.props.prevPage}>
             <FontAwesome
               name="fa-caret-left"
               className="fas fa-caret-left"
             />
           </button>
 
-          <button className='btn next' type='button' onClick={this.nextPage}>{buttonText}</button>
+          <button className='btn next' type='button' onClick={this.props.nextPage}>{buttonText}</button>
 
-          <button className='btn' type='button' onClick={this.lastPage}>
+          <button className='btn' type='button' onClick={this.props.lastPage}>
             <FontAwesome
               name="fa-step-forward"
               className="fas fa-step-forward"
@@ -260,34 +321,6 @@ class RecipePage extends Component {
         </div>
       </div>
     );
-  }
-
-  // Go forward a page
-  // TODO: Later refactor into separate component
-  nextPage() { 
-    if (this.state.page+1 < this.state.steps.length) {
-      this.setState({
-        page: this.state.page+1
-      });
-    }
-    console.log('Continue to ' + this.props.page.toString());
-  }
-
-  // Go back a page
-  // TODO: Replace with page menu
-  prevPage() {
-    if (!this.state.page-1 < 0) {
-      this.setState({
-        page: this.state.page-1
-      });
-    }
-  }
-
-  // Skip to the next required input
-  lastPage() {
-    this.setState({
-      page: this.state.steps.length-1
-    });
   }
 }
 
@@ -309,38 +342,16 @@ class App extends Component {
 
   render() {
     let stepsToRender = this.state.recipeData.recipe ? this.state.recipeData.recipe.steps
-      /* FILTER CODE NOT NEEDED YET.filter(step =>
-        step.name.toLowerCase().includes(
-          this.state.filterString.toLowerCase())
-    )*/ 
     : []
-
     return (
       <div className='App'>
         {this.state.recipeData.recipe ?
-          <div>
-            <h1 style={{...defaultStyle, 'fontSize': '32px'}}>
-              {this.state.recipeData.recipe.name}
-            </h1>
-            
-            {/*<PlaylistCounter playlists={stepsToRender}/>
-            <HoursCounter playlists={stepsToRender}/>
-            
-            <Filter 
-              onTextChange={text => this.setState({filterString: text})} 
-            />*/}
-            
-            {/*{stepsToRender.filter(step =>
-              step.name.toLowerCase().includes(
-                this.state.filterString.toLowerCase()
-              )
-            ).map((step,id) =>
-              <RecipePage key={id.toString()} value={id} step={step}/>
-              )}*/}
-
-            <RecipePage page={currentPage} steps={stepsToRender}/>
-
-          </div> : <h1 style={defaultStyle}>Loading Recipe...</h1>
+          <RecipeScreen 
+            page={currentPage} 
+            steps={stepsToRender}
+            recipeName={this.state.recipeData.recipe.name}
+            className='recipe-screen' >
+          </RecipeScreen> : <h1 style={{margin:'0', padding:'0'}}>Loading Recipe...</h1>
         }
       </div>
     );
