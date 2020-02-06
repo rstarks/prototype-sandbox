@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import FontAwesome from 'react-fontawesome';
 
 let currentPage = 0;
 let defaultStyle = {
@@ -79,7 +80,7 @@ let fakeRecipeData = {
   }
 }
 
-class PlaylistCounter extends Component {
+/*class PlaylistCounter extends Component {
   render() {
     return (
       <div style={{...defaultStyle, width: "40%", display:'inline-block'}}>
@@ -115,7 +116,7 @@ class Filter extends Component {
       </div>
     );
   }
-}
+}*/
 
 class ParameterSelector extends Component {
   constructor(props) {
@@ -128,6 +129,7 @@ class ParameterSelector extends Component {
   
   // Change the selected value
   onChange(event) {
+    event.target.checked = true;
     const group = event.target.name;
     const id = event.target.id;
     const option = {group, id, option: event.target.value };
@@ -145,30 +147,41 @@ class ParameterSelector extends Component {
   }
 
   render() {
-    let parameterHeaders = [];
+    let parameterOptions = [];
+
     this.props.parameters.map((parameter,key) => 
       (
-        parameterHeaders.push(
-          <div key={key} style={{marginTop:'24px'}}>{parameter.name}</div>,
-          parameter.options.map((option, index) => 
-            <label style={{display:'block', marginBottom:'12px'}} key={index}>
-              <input 
-                type='radio' 
-                value={option.value}
-                id={index}
-                name={parameter.name}
-                defaultChecked={index == 0 ? true : false}
-                onChange={this.onChange}
-              />
-              {option.label} - {option.value}
-            </label>
-          )
+        parameterOptions.push(
+          <div key={key}>
+            <div key={key} className='multi-selector-header'>
+              {parameter.name}
+            </div>
+            <div className='multi-selector-group'>
+              {
+                parameter.options.map((option, index) => 
+                  <div key={index} className='multi-selector-wrapper'>
+                    <input 
+                      type='radio' 
+                      value={option.value}
+                      id={key.toString() + index.toString()}
+                      name={parameter.name} 
+                      onChange={this.onChange}
+                    />
+                    <label htmlFor={key.toString() + index.toString()} key={index}>
+                    
+                    {option.label}<br />{parameter.name === "Doneness" ? option.value: ' '}
+                  </label></div>
+                )
+              }
+            </div>
+          </div>
         )
       )
     );
+
     return (
       <div style={defaultStyle}><form>
-        {parameterHeaders}
+        {parameterOptions}
       </form></div>
     )
   }
@@ -177,18 +190,33 @@ class ParameterSelector extends Component {
 class RecipePage extends Component {
   constructor(props) {
     super(props);
+    this.wrapperRef = React.createRef();
     this.state = {
       page: this.props.page,
       steps: this.props.steps,
     }
+
+    // Navigation bindings
     this.nextPage = this.nextPage.bind(this);
     this.lastPage = this.lastPage.bind(this);
     this.prevPage = this.prevPage.bind(this);
   }
 
+  // Used for page transition effect
+  /*componentWillUpdate() {
+    setTimeout(() => {
+      this.changePage();
+    }, 1000);
+  }*/
+
+  changePage() {
+    // Animation testing
+    const wrapper = this.wrapperRef.current;
+    wrapper.classList.toggle('flip');
+  }
+
   render() {
     let buttonText = '';
-    let testText = '';
     
     // Set the button text
     if (this.state.page + 1 === this.state.steps.length) {
@@ -199,23 +227,43 @@ class RecipePage extends Component {
 
     // Return the component markup
     return (
-      <div style={{...defaultStyle,float:'right',display:'inlineblock',width: "25%"}}>
-        <h3><span>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
-        <div>{this.state.steps[this.state.page].instructions}</div>
+      <div className='card'>
 
-        <div><ParameterSelector parameters={this.state.steps[this.state.page].parameters} /></div>
+        <div className='instructions-wrapper'>
+          <div ref={this.wrapperRef} className='instructions'>
+            <h3><span className='step-counter'>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
+            <div>{this.state.steps[this.state.page].instructions}</div>
+
+            <div className='multi-selector'>
+              <ParameterSelector parameters={this.state.steps[this.state.page].parameters} />
+            </div>
+          </div>
+        </div>
 
         {/* Navigation Buttons */}
-        <button className='btn btn-secondary' type='button' onClick={this.prevPage}>&lt;</button>
+        <div className='nav'>
+          <button className='btn' type='button' onClick={this.prevPage}>
+            <FontAwesome
+              name="fa-caret-left"
+              className="fas fa-caret-left"
+            />
+          </button>
 
-        <button className='btn btn-primary' type='button' onClick={this.nextPage}>{buttonText}</button>
+          <button className='btn next' type='button' onClick={this.nextPage}>{buttonText}</button>
 
-        <button className='btn btn-secondary' type='button' onClick={this.lastPage}>&gt;|</button>
+          <button className='btn' type='button' onClick={this.lastPage}>
+            <FontAwesome
+              name="fa-step-forward"
+              className="fas fa-step-forward"
+            />
+          </button>
+        </div>
       </div>
     );
   }
 
-  // later refactor into separate component
+  // Go forward a page
+  // TODO: Later refactor into separate component
   nextPage() { 
     if (this.state.page+1 < this.state.steps.length) {
       this.setState({
@@ -225,6 +273,8 @@ class RecipePage extends Component {
     console.log('Continue to ' + this.props.page.toString());
   }
 
+  // Go back a page
+  // TODO: Replace with page menu
   prevPage() {
     if (!this.state.page-1 < 0) {
       this.setState({
@@ -233,6 +283,7 @@ class RecipePage extends Component {
     }
   }
 
+  // Skip to the next required input
   lastPage() {
     this.setState({
       page: this.state.steps.length-1
