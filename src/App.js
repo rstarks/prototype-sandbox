@@ -277,35 +277,52 @@ class RecipePage extends Component {
 
         <div className='instructions-wrapper'>
           <div ref={this.wrapperRef} className='instructions'>
-            <h3><span className='step-counter'>{this.state.page + 1}</span> {this.state.steps[this.state.page].name}</h3>
+
+            {/* Step number and name */}
+            <h3>
+              <span className='step-counter'>{this.state.page + 1}</span> 
+              {this.state.steps[this.state.page].name}
+            </h3>
             
+            {/* Parameters (if included) inserted */}
             <div className='multi-selector'>
               <ParameterSelector parameters={this.state.steps[this.state.page].parameters} />
             </div>
 
+            {/* Instructions inserted */}
             <div className='instructions-text'>{this.state.steps[this.state.page].instructions}</div>
-
-            
           </div>
         </div>
 
         {/* Navigation Buttons */}
         <div className='nav'>
-          <button className='btn' type='button' onClick={this.props.prevPage}>
-            <FontAwesome
-              name="fa-caret-left"
-              className="fas fa-caret-left"
-            />
-          </button>
 
+          {/* Previous Page Button */}
+          {this.state.page > 0 ?
+            <button className='btn' type='button' onClick={this.props.prevPage}>
+              <FontAwesome
+                name="fa-caret-left"
+                className="fas fa-caret-left"
+              />
+            </button> : 
+            /* Hide the button on the first page */
+            <button style={{opacity:"0"}} className='btn'> &nbsp; </button>}
+
+          {/* Next Page / Continue Button */}
           <button className='btn next' type='button' onClick={this.props.nextPage}>{buttonText}</button>
 
+          {/* Last Page Button */}
+          {this.state.page + 1 < this.state.steps.length ?
           <button className='btn' type='button' onClick={this.props.lastPage}>
             <FontAwesome
               name="fa-step-forward"
               className="fas fa-step-forward"
             />
-          </button>
+          </button> : 
+          /* Hide the button on last page */
+          <button style={{opacity:"0"}} className='btn'> &nbsp; </button>}
+
+
         </div>
       </div>
     );
@@ -325,7 +342,7 @@ class App extends Component {
   componentDidMount() {
     setTimeout(() => {
       this.setState({recipeData: fakeRecipeData});
-    }, 1000);
+    }, 1500);
   }
 
   render() {
@@ -334,12 +351,25 @@ class App extends Component {
     return (
       <div className='App'>
         {this.state.recipeData.recipe ?
+
+          /* Full Interactive Instructions */
           <RecipeScreen 
             page={currentPage} 
             steps={stepsToRender}
             recipeName={this.state.recipeData.recipe.name}
             className='recipe-screen' >
-          </RecipeScreen> : <h1 style={{margin:'0', padding:'0'}}>Loading Recipe...</h1>
+          </RecipeScreen> : 
+
+          /* Loader markup */
+          <div className='loader'>
+            <div className='loader-wrapper'>
+              <FontAwesome
+                name="fa-spinner fa-pulse"
+                className="fas fa-spinner fa-pulse" 
+              />
+              <div style={{margin:'0', padding:'0'}}>Loading Recipe...</div>
+            </div>
+          </div>
         }
       </div>
     );
