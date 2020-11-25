@@ -2,6 +2,13 @@ import React, { Component } from 'react';
 import './App.css';
 import FontAwesome from 'react-fontawesome';
 
+import step01 from './images/salmon-potatoes-greenbeans/step-01.jpg';
+import step02 from './images/salmon-potatoes-greenbeans/step-02.jpg';
+import step03 from './images/salmon-potatoes-greenbeans/step-03.jpg';
+import step04 from './images/salmon-potatoes-greenbeans/step-04.jpg';
+import step05 from './images/salmon-potatoes-greenbeans/step-05.jpg';
+import step06 from './images/salmon-potatoes-greenbeans/step-06.jpg';
+
 let currentPage = 0;
 let defaultStyle = {
   color: '#000',
@@ -90,7 +97,8 @@ let fakeRecipeData = {
 }
 
 // Dynamically load from JSON if possible
-const images = [{
+const images = [step01, step02, step03, step04, step05, step06];
+/*const images = [{
   name: 'step-01',
   background: require('./images/salmon-potatoes-greenbeans/step-01.jpg')
 },{
@@ -108,7 +116,7 @@ const images = [{
 },{
   name: 'step-06',
   background: require('./images/salmon-potatoes-greenbeans/step-06.jpg')
-}]
+}]*/
 
 class ParameterSelector extends Component {
   constructor(props) {
@@ -230,7 +238,7 @@ class RecipeScreen extends Component {
       //Switch to dynamic loading system, load in images dynamically from JSON
       <div className='recipe-screen'
       style={{
-        backgroundImage: 'url(' + images[this.state.page].background + ')',
+        backgroundImage: 'url(' + images[this.state.page] + ')',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: '0px',
