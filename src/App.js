@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import FontAwesome from 'react-fontawesome';
 
+// Static image import
 import step01 from './images/salmon-potatoes-greenbeans/step-01.jpg';
 import step02 from './images/salmon-potatoes-greenbeans/step-02.jpg';
 import step03 from './images/salmon-potatoes-greenbeans/step-03.jpg';
@@ -15,6 +16,8 @@ let defaultStyle = {
   margin: '0px',
   padding: '0px'
 };
+
+// Fake recipe data to be loaded into the prototype
 let fakeRecipeData = {
   recipe: {
     name: 'Salmon, Potatoes, and Green Beans',
@@ -98,29 +101,10 @@ let fakeRecipeData = {
 
 // Dynamically load from JSON if possible
 const images = [step01, step02, step03, step04, step05, step06];
-/*const images = [{
-  name: 'step-01',
-  background: require('./images/salmon-potatoes-greenbeans/step-01.jpg')
-},{
-  name: 'step-02',
-  background: require('./images/salmon-potatoes-greenbeans/step-02.jpg')
-},{
-  name: 'step-03',
-  background: require('./images/salmon-potatoes-greenbeans/step-03.jpg')
-},{
-  name: 'step-04',
-  background: require('./images/salmon-potatoes-greenbeans/step-04.jpg')
-},{
-  name: 'step-05',
-  background: require('./images/salmon-potatoes-greenbeans/step-05.jpg')
-},{
-  name: 'step-06',
-  background: require('./images/salmon-potatoes-greenbeans/step-06.jpg')
-}]*/
 
 class ParameterSelector extends Component {
   constructor(props) {
-    super(props);
+    super();
     this.state={
       options: []
     }
@@ -194,10 +178,10 @@ class ParameterSelector extends Component {
 
 class RecipeScreen extends Component {
   constructor(props) {
-    super(props);
+    super();
     this.state = {
-      page: this.props.page,
-      steps: this.props.steps,
+      page: props.page,
+      steps: props.steps,
     }
     this.nextPage = this.nextPage.bind(this);
     this.lastPage = this.lastPage.bind(this);
@@ -261,7 +245,7 @@ class RecipeScreen extends Component {
 
 class RecipePage extends Component {
   constructor(props) {
-    super(props);
+    super();
     this.state = {}
   }
 
